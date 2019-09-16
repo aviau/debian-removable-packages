@@ -26,22 +26,16 @@ def get_pkgs():
     return list(pkgs)
 
 def check_removable(pkg):
-
-    output = ""
-
-    def _check_output():
-        return subprocess.check_output(
-            ["debian-rm", pkg],
-        )
-
-    try:
-        output = _check_output()
-    except Exception:
-        time.sleep(20)
+    failed_attempts = 0
+    while failed_attempts < 5:
         try:
-            output = _check_output()
+            output = subprocess.check_output(
+                ["debian-rm", pkg],
+            )
+            break
         except Exception:
-            pass
+            failed_attempts = failed_attempts + 1
+            time.sleep(20)
 
     removable = "No dependency problem found." in output.decode()
 
