@@ -3,6 +3,7 @@
 from bs4 import BeautifulSoup
 from multiprocessing.pool import ThreadPool
 import subprocess
+import time
 
 def get_pkgs():
     with open("dqa.html", "r") as f:
@@ -25,9 +26,22 @@ def get_pkgs():
     return list(pkgs)
 
 def check_removable(pkg):
-    output = subprocess.check_output(
-        ["debian-rm", pkg],
-    )
+
+    output = ""
+
+    def _check_output():
+        return subprocess.check_output(
+            ["debian-rm", pkg],
+        )
+
+    try:
+        output = _check_output()
+    except Exception:
+        time.sleep(20)
+        try:
+            output = _check_output()
+        except Exception:
+            pass
 
     removable = "No dependency problem found." in output.decode()
 
