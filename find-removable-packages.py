@@ -48,9 +48,14 @@ def main():
 
     pool = ThreadPool(processes=16)
 
+    removables = list()
+
     for pkg, removable in pool.imap_unordered(check_removable, pkgs):
         if removable:
            print(f"{pkg} is removable")
+           removables.append(pkg)
+
+    print("Removables:", removables)
 
 
 if __name__ == "__main__":
